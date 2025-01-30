@@ -68,13 +68,16 @@ for i, c in enumerate(comunidades_raca):
         comunidade_por_no_raca[node] = i
 
 # ---------------------------------------------------
-# 4) Salvar e visualizar o grafo com as comunidades de forma aprimorada
+# 4) Salvar e visualizar o grafo com as comunidades (Versão Ampliada e com Rótulos)
 # ---------------------------------------------------
 
 sns.set_theme(style="whitegrid")
 
-# Obter layout fixo para consistência visual
-pos_raca = nx.kamada_kawai_layout(G_raca)
+# Definir layout Kamada-Kawai com scale maior para espaçar mais os nós
+pos_raca = nx.kamada_kawai_layout(G_raca, scale=5)
+
+# Criar uma figura maior
+fig, ax = plt.subplots(figsize=(20, 20))
 
 # Preparar cores para as comunidades
 comunidades_ordenadas_raca = sorted(set(comunidade_por_no_raca.values()))
@@ -87,38 +90,50 @@ sm.set_array([])
 node_colors_raca = [comunidade_por_no_raca[node] for node in G_raca.nodes()]
 cores_mapeadas_raca = [cmap(norm(comunidade)) for comunidade in node_colors_raca]
 
-fig, ax = plt.subplots(figsize=(12, 12))
+# Desenhar os nós
 nx.draw_networkx_nodes(
     G_raca,
     pos_raca,
-    node_size=300,
+    node_size=200,             # Nó um pouco menor
     node_color=cores_mapeadas_raca,
     cmap=cmap,
+    alpha=0.9,                 # Leve transparência
     ax=ax
 )
+
+# Desenhar as arestas
 nx.draw_networkx_edges(
     G_raca,
     pos_raca,
-    width=2.5,
-    alpha=0.5,
+    width=1.0,                 # Arestas mais finas
+    alpha=0.5,                 # Arestas translúcidas
     edge_color='gray',
     ax=ax
 )
-# Exibir rótulos se desejado:
-# nx.draw_networkx_labels(G_raca, pos_raca, font_size=8, ax=ax)
 
-ax.set_title("Comunidades baseadas em similaridade racial")
+# Desenhar rótulos das cidades (nós)
+nx.draw_networkx_labels(
+    G_raca,
+    pos_raca,
+    font_size=10,
+    font_color='black',
+    ax=ax
+)
+
+ax.set_title("Comunidades baseadas em similaridade racial (Versão Ampliada)")
 ax.axis('off')
-cbar = fig.colorbar(sm, ax=ax)
+
+# Barra de cores para as comunidades
+cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
-# Salvar o gráfico do grafo
+# Pasta de saída (já definida antes)
 output_dir = "Grafos"
 os.makedirs(output_dir, exist_ok=True)
-output_file = os.path.join(output_dir, "grafoComunidadesRaca_melhorado.png")
-plt.savefig(output_file, dpi=300)
+output_file = os.path.join(output_dir, "grafoComunidadesRaca_grande.png")
+plt.savefig(output_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Grafo melhorado salvo como '{output_file}'")
+print(f"Grafo ampliado salvo como '{output_file}'")
 
 # ---------------------------------------------------
 # 5) Analisar as comunidades e imprimir raças dominantes
@@ -218,3 +233,87 @@ for comunidade, totais in totais_por_comunidade_raca.iterrows():
             print(f" - {raca}: {percentual:.2f}% de internações")
     else:
         print(" - Sem dados de internações nessa comunidade.")
+
+
+# ---------------------------------------------------
+# 9) Identificar os Hubs em Cada Comunidade
+# ---------------------------------------------------
+
+print("\n=== Hubs (Nodos Mais Conectados) por Comunidade ===")
+
+# Criar um dicionário para armazenar o hub de cada comunidade
+hubs_por_comunidade = {}
+
+for i, comunidade in enumerate(comunidades_raca):
+    subgrafo = G_raca.subgraph(comunidade)  # Criar subgrafo da comunidade
+    grau_centralidade = nx.degree_centrality(subgrafo)  # Calcular grau de centralidade
+
+    # Encontrar o nó com maior centralidade na comunidade
+    hub = max(grau_centralidade, key=grau_centralidade.get)
+    hubs_por_comunidade[i] = hub
+
+    print(f"Comunidade {i}: Hub → {hub} (Grau de Centralidade: {grau_centralidade[hub]:.4f})")
+
+# ---------------------------------------------------
+# 10) Destacar os Hubs no Grafo
+# ---------------------------------------------------
+
+# Criar uma nova cópia do layout para garantir consistência
+pos_hubs = pos_raca.copy()
+
+fig, ax = plt.subplots(figsize=(20, 20))
+
+# Desenhar nós normalmente
+nx.draw_networkx_nodes(
+    G_raca,
+    pos_hubs,
+    node_size=200,
+    node_color=cores_mapeadas_raca,
+    cmap=cmap,
+    alpha=0.9,
+    ax=ax
+)
+
+# Desenhar arestas
+nx.draw_networkx_edges(
+    G_raca,
+    pos_hubs,
+    width=1.0,
+    alpha=0.5,
+    edge_color='gray',
+    ax=ax
+)
+
+# Destacar os hubs em vermelho e aumentar o tamanho deles
+nx.draw_networkx_nodes(
+    G_raca,
+    pos_hubs,
+    nodelist=hubs_por_comunidade.values(),
+    node_size=500,
+    node_color='red',
+    edgecolors='black',
+    linewidths=2,
+    label="Hubs",
+    ax=ax
+)
+
+# Adicionar rótulos dos nós
+nx.draw_networkx_labels(
+    G_raca,
+    pos_hubs,
+    font_size=10,
+    font_color='black',
+    ax=ax
+)
+
+ax.set_title("Hubs por Comunidade na Rede Racial")
+ax.axis('off')
+
+# Adicionar legenda
+plt.legend(scatterpoints=1, loc='upper right')
+
+# Salvar a imagem do grafo com hubs destacados
+output_file_hubs = os.path.join(output_dir, "grafoComunidadesRaca_hubs.png")
+plt.savefig(output_file_hubs, dpi=300, bbox_inches='tight')
+plt.close()
+print(f"Grafo com hubs destacado salvo como '{output_file_hubs}'")

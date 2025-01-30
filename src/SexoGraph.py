@@ -104,7 +104,13 @@ for i, comunidade in enumerate(comunidades_sexo):
 
 sns.set_theme(style="whitegrid")
 
-pos_sexo = nx.kamada_kawai_layout(G_sexo)
+# Tente usar um layout que deixa os nós mais espaçados, por exemplo:
+# pos_sexo = nx.spring_layout(G_sexo, k=0.8, iterations=100, seed=42)
+# ou
+pos_sexo = nx.kamada_kawai_layout(G_sexo, scale=5)
+
+# Definição de uma figura maior
+fig, ax = plt.subplots(figsize=(20, 20))
 
 comunidades_ordenadas = sorted(set(comunidade_por_no_sexo.values()))
 num_comunidades = len(comunidades_ordenadas)
@@ -116,36 +122,47 @@ sm.set_array([])
 node_colors = [comunidade_por_no_sexo[node] for node in G_sexo.nodes()]
 cores_mapeadas = [cmap(norm(comunidade)) for comunidade in node_colors]
 
-fig, ax = plt.subplots(figsize=(12, 12))
+# Desenhar nós
 nx.draw_networkx_nodes(
     G_sexo,
     pos_sexo,
-    node_size=300,
+    node_size=200,               # Diminui um pouco o tamanho dos nós
     node_color=cores_mapeadas,
     cmap=cmap,
+    alpha=0.9,                   # Deixa os nós ligeiramente translúcidos
     ax=ax
 )
+
+# Desenhar arestas
 nx.draw_networkx_edges(
     G_sexo,
     pos_sexo,
-    width=2.5,
-    alpha=0.5,
+    width=1.0,                  # Arestas mais finas
+    alpha=0.5,                  # Arestas mais translúcidas
     edge_color='gray',
     ax=ax
 )
-# Caso deseje rótulos: nx.draw_networkx_labels(G_sexo, pos_sexo, font_size=8, ax=ax)
 
-ax.set_title("Comunidades baseadas em similaridade de distribuição de sexo")
+# Desenhar rótulos (nomes das cidades)
+nx.draw_networkx_labels(
+    G_sexo,
+    pos_sexo,
+    font_size=10,
+    font_color='black',
+    ax=ax
+)
+
+ax.set_title("Comunidades baseadas em similaridade de distribuição de sexo (Figura Ampliada)")
 ax.axis('off')
 
-cbar = fig.colorbar(sm, ax=ax)
+# Barra de cores
+cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
-output_file = os.path.join(output_dir, "grafoComunidadesSexo_melhorado.png")
-plt.savefig(output_file, dpi=300)
+output_file = os.path.join(output_dir, "grafoComunidadesSexo_grande.png")
+plt.savefig(output_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Grafo melhorado salvo como '{output_file}'")
-
+print(f"Grafo grande salvo como '{output_file}'")
 # ---------------------------------------------------
 # 5) Analisar as comunidades e imprimir sexo dominante
 # ---------------------------------------------------
@@ -209,4 +226,89 @@ totais_gerais = df[colunas_sexo].sum()
 print("\n=== Totais Gerais por Sexo no Grafo ===")
 for sexo, total in totais_gerais.items():
     print(f" - {sexo}: {int(total):,} pessoas")
+
+
+# ---------------------------------------------------
+# 7) Identificar os Hubs (Nodos Mais Conectados) por Comunidade
+# ---------------------------------------------------
+
+print("\n=== Hubs (Nodos Mais Conectados) por Comunidade ===")
+
+# Criar um dicionário para armazenar o hub de cada comunidade
+hubs_por_comunidade = {}
+
+for i, comunidade in enumerate(comunidades_sexo):
+    subgrafo = G_sexo.subgraph(comunidade)  # Criar subgrafo da comunidade
+    grau_centralidade = nx.degree_centrality(subgrafo)  # Calcular grau de centralidade
+
+    # Encontrar o nó com maior centralidade na comunidade
+    hub = max(grau_centralidade, key=grau_centralidade.get)
+    hubs_por_comunidade[i] = hub
+
+    print(f"Comunidade {i}: Hub → {hub} (Grau de Centralidade: {grau_centralidade[hub]:.4f})")
+
+# ---------------------------------------------------
+# 8) Destacar os Hubs no Grafo
+# ---------------------------------------------------
+
+# Criar uma nova cópia do layout para garantir consistência
+pos_hubs = pos_sexo.copy()
+
+fig, ax = plt.subplots(figsize=(20, 20))
+
+# Desenhar nós normalmente
+nx.draw_networkx_nodes(
+    G_sexo,
+    pos_hubs,
+    node_size=200,
+    node_color=cores_mapeadas,
+    cmap=cmap,
+    alpha=0.9,
+    ax=ax
+)
+
+# Desenhar arestas
+nx.draw_networkx_edges(
+    G_sexo,
+    pos_hubs,
+    width=1.0,
+    alpha=0.5,
+    edge_color='gray',
+    ax=ax
+)
+
+# Destacar os hubs em vermelho e aumentar o tamanho deles
+nx.draw_networkx_nodes(
+    G_sexo,
+    pos_hubs,
+    nodelist=hubs_por_comunidade.values(),
+    node_size=600,
+    node_color='red',
+    edgecolors='black',
+    linewidths=2,
+    label="Hubs",
+    ax=ax
+)
+
+# Adicionar rótulos dos nós
+nx.draw_networkx_labels(
+    G_sexo,
+    pos_hubs,
+    font_size=10,
+    font_color='black',
+    ax=ax
+)
+
+ax.set_title("Hubs por Comunidade na Rede de Similaridade de Sexo")
+ax.axis('off')
+
+# Adicionar legenda
+plt.legend(scatterpoints=1, loc='upper right')
+
+# Salvar a imagem do grafo com hubs destacados
+output_file_hubs = os.path.join(output_dir, "grafoComunidadesSexo_hubs.png")
+plt.savefig(output_file_hubs, dpi=300, bbox_inches='tight')
+plt.close()
+print(f"Grafo com hubs destacado salvo como '{output_file_hubs}'")
+
 

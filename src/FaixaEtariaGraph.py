@@ -74,13 +74,18 @@ for i, c in enumerate(comunidades_faixa_etaria):
         comunidade_por_no_faixa[node] = i
 
 # ---------------------------------------------------
-# 4) Visualizar e salvar o grafo com comunidades aprimorado
+# 4) Visualizar e salvar o grafo com o mesmo design dos outros
 # ---------------------------------------------------
 
 sns.set_theme(style="whitegrid")
 
-pos_faixa = nx.kamada_kawai_layout(G_faixa_etaria)
+# Layout ajustado para mais espaçamento
+pos_faixa = nx.kamada_kawai_layout(G_faixa_etaria, scale=5)
 
+# Criar uma figura maior
+fig, ax = plt.subplots(figsize=(20, 20))
+
+# Preparar cores para as comunidades
 comunidades_ordenadas_faixa = sorted(set(comunidade_por_no_faixa.values()))
 num_comunidades_faixa = len(comunidades_ordenadas_faixa)
 cmap = plt.cm.viridis
@@ -91,35 +96,52 @@ sm.set_array([])
 node_colors_faixa = [comunidade_por_no_faixa[node] for node in G_faixa_etaria.nodes()]
 cores_mapeadas_faixa = [cmap(norm(comunidade)) for comunidade in node_colors_faixa]
 
-fig, ax = plt.subplots(figsize=(12, 12))
+# Desenhar nós
 nx.draw_networkx_nodes(
     G_faixa_etaria,
     pos_faixa,
-    node_size=300,
+    node_size=200,               # Nós um pouco menores
     node_color=cores_mapeadas_faixa,
     cmap=cmap,
+    alpha=0.9,                   # Leve transparência
     ax=ax
 )
+
+# Desenhar arestas
 nx.draw_networkx_edges(
     G_faixa_etaria,
     pos_faixa,
-    width=2.5,
-    alpha=0.5,
+    width=1.0,                   # Arestas mais finas
+    alpha=0.5,                   # Arestas mais translúcidas
     edge_color='gray',
     ax=ax
 )
 
-ax.set_title("Comunidades baseadas em similaridade de faixa etária")
+# Desenhar rótulos (nomes das cidades)
+nx.draw_networkx_labels(
+    G_faixa_etaria,
+    pos_faixa,
+    font_size=10,
+    font_color='black',
+    ax=ax
+)
+
+ax.set_title("Comunidades baseadas em similaridade de faixa etária (Figura Ampliada)")
 ax.axis('off')
-cbar = fig.colorbar(sm, ax=ax)
+
+# Barra de cores
+cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
+# Criar pasta se não existir
 output_dir = "Grafos"
 os.makedirs(output_dir, exist_ok=True)
-output_file = os.path.join(output_dir, "grafoComunidadesFaixaEtaria_melhorado.png")
-plt.savefig(output_file, dpi=300)
+
+# Salvar grafo
+output_file = os.path.join(output_dir, "grafoComunidadesFaixaEtaria_grande.png")
+plt.savefig(output_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Grafo melhorado salvo como '{output_file}'")
+print(f"Grafo grande salvo como '{output_file}'")
 
 # ---------------------------------------------------
 # 5) Analisar as comunidades e imprimir faixas etárias dominantes
@@ -196,3 +218,24 @@ for comunidade, totais in totais_por_comunidade_idade.iterrows():
             print(f" - {faixa}: {percentual:.2f}% de internações")
     else:
         print(" - Sem dados de internações nessa comunidade.")
+
+
+# ---------------------------------------------------
+# 8) Criar e salvar um Boxplot das distribuições de faixa etária
+# ---------------------------------------------------
+
+# Criar a figura do boxplot
+fig, ax = plt.subplots(figsize=(15, 8))
+sns.boxplot(data=df[colunas_idade], palette="viridis", ax=ax)
+
+# Ajustes visuais
+ax.set_title("Distribuição das Faixas Etárias entre as Cidades")
+ax.set_xlabel("Faixa Etária")
+ax.set_ylabel("Número de Pessoas")
+ax.grid(True, linestyle="--", alpha=0.5)
+
+# Salvar o gráfico
+boxplot_file = os.path.join(output_dir, "boxplot_faixa_etaria.png")
+plt.savefig(boxplot_file, dpi=300, bbox_inches='tight')
+plt.close()
+print(f"Boxplot salvo como '{boxplot_file}'")
