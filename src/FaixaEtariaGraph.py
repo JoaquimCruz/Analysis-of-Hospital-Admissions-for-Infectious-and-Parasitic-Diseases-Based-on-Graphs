@@ -13,10 +13,6 @@ import random
 import matplotlib
 matplotlib.use('Agg')  # Backend para salvar gráficos
 
-# ---------------------------------------------------
-# 1) Carregar os dados do Excel (incluindo população)
-# ---------------------------------------------------
-
 # Carregar o arquivo Excel com dados de faixa etária e população
 df = pd.read_excel("/home/joaquim/Documents/Graph-Based-Analysis-of-Hospital-Admissions-in-Western-Minas-Gerais/Planilhas/FaixaEtaria.xlsx", header=None)
 
@@ -33,10 +29,6 @@ print(df.head())
 # Capturar os nomes das colunas de faixa etária (excluindo 'Populacao')
 colunas_idade = ["<1 ano", "1-4 anos", "5-14 anos", "15-24 anos", 
                  "25-34 anos", "35-44 anos", "45-54 anos", "55-64 anos", "65+ anos"]
-
-# ---------------------------------------------------
-# 2) Criar o grafo com base em similaridade de faixa etária
-# ---------------------------------------------------
 
 G_faixa_etaria = nx.Graph()
 
@@ -57,9 +49,6 @@ for i, cidade1 in enumerate(df.index):
         if i < j and sim_matrix[i, j] > limiar:
             G_faixa_etaria.add_edge(cidade1, cidade2, weight=sim_matrix[i, j])
 
-# ---------------------------------------------------
-# 3) Detectar comunidades no grafo
-# ---------------------------------------------------
 
 comunidades_faixa_etaria = community.greedy_modularity_communities(G_faixa_etaria, weight='weight')
 
@@ -73,9 +62,6 @@ for i, c in enumerate(comunidades_faixa_etaria):
     for node in c:
         comunidade_por_no_faixa[node] = i
 
-# ---------------------------------------------------
-# 4) Visualizar e salvar o grafo com o mesmo design dos outros
-# ---------------------------------------------------
 
 sns.set_theme(style="whitegrid")
 
@@ -100,10 +86,10 @@ cores_mapeadas_faixa = [cmap(norm(comunidade)) for comunidade in node_colors_fai
 nx.draw_networkx_nodes(
     G_faixa_etaria,
     pos_faixa,
-    node_size=200,               # Nós um pouco menores
+    node_size=200,               
     node_color=cores_mapeadas_faixa,
     cmap=cmap,
-    alpha=0.9,                   # Leve transparência
+    alpha=0.9,                   
     ax=ax
 )
 
@@ -111,8 +97,8 @@ nx.draw_networkx_nodes(
 nx.draw_networkx_edges(
     G_faixa_etaria,
     pos_faixa,
-    width=1.0,                   # Arestas mais finas
-    alpha=0.5,                   # Arestas mais translúcidas
+    width=1.0,                  
+    alpha=0.5,                   
     edge_color='gray',
     ax=ax
 )
@@ -121,7 +107,7 @@ nx.draw_networkx_edges(
 nx.draw_networkx_labels(
     G_faixa_etaria,
     pos_faixa,
-    font_size=10,
+    font_size=16,
     font_color='black',
     ax=ax
 )
@@ -129,23 +115,16 @@ nx.draw_networkx_labels(
 ax.set_title("Comunidades baseadas em similaridade de faixa etária (Figura Ampliada)")
 ax.axis('off')
 
-# Barra de cores
 cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
-# Criar pasta se não existir
 output_dir = "Grafos"
 os.makedirs(output_dir, exist_ok=True)
 
-# Salvar grafo
 output_file = os.path.join(output_dir, "grafoComunidadesFaixaEtaria_grande.png")
 plt.savefig(output_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Grafo grande salvo como '{output_file}'")
 
-# ---------------------------------------------------
-# 5) Analisar as comunidades e imprimir faixas etárias dominantes
-# ---------------------------------------------------
 
 df['Comunidade_faixa_etaria'] = df.index.map(comunidade_por_no_faixa)
 
@@ -156,9 +135,6 @@ print("\n=== Faixas etárias dominantes por comunidade ===")
 for comunidade, faixa in faixas_dominantes.items():
     print(f"Comunidade {comunidade}: {faixa}")
 
-# ---------------------------------------------------
-# 6) Análise Detalhada das Comunidades
-# ---------------------------------------------------
 print("\n=== Análise Detalhada das Comunidades ===")
 
 for i, comunidade in enumerate(comunidades_faixa_etaria):
@@ -183,14 +159,10 @@ for i, comunidade in enumerate(comunidades_faixa_etaria):
     for faixa, total in totais_faixa_etaria.items():
         print(f"   - {faixa}: {int(total):,} internações")
 
-# ---------------------------------------------------
-# 7) Taxa de internação por população e por faixa etária em cada comunidade
-# ---------------------------------------------------
-
 # Cálculo da população total por comunidade
 populacao_por_comunidade_idade = df.groupby('Comunidade_faixa_etaria')['Populacao'].sum()
 
-# Cálculo do total de internações por comunidade (soma de todas as faixas etárias)
+# Cálculo do total de internações por comunidade 
 internacoes_por_comunidade_idade = df.groupby('Comunidade_faixa_etaria')[colunas_idade].sum().sum(axis=1)
 
 # Cálculo da relação porcentual de internações em relação à população
@@ -220,22 +192,16 @@ for comunidade, totais in totais_por_comunidade_idade.iterrows():
         print(" - Sem dados de internações nessa comunidade.")
 
 
-# ---------------------------------------------------
-# 8) Criar e salvar um Boxplot das distribuições de faixa etária
-# ---------------------------------------------------
-
-# Criar a figura do boxplot
 fig, ax = plt.subplots(figsize=(15, 8))
 sns.boxplot(data=df[colunas_idade], palette="viridis", ax=ax)
 
-# Ajustes visuais
+
 ax.set_title("Distribuição das Faixas Etárias entre as Cidades")
 ax.set_xlabel("Faixa Etária")
 ax.set_ylabel("Número de Pessoas")
 ax.grid(True, linestyle="--", alpha=0.5)
 
-# Salvar o gráfico
+
 boxplot_file = os.path.join(output_dir, "boxplot_faixa_etaria.png")
 plt.savefig(boxplot_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Boxplot salvo como '{boxplot_file}'")
