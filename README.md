@@ -15,7 +15,7 @@ Agrupamos as cidades com base em características como gênero, raça/etnia e fa
 
 ## Artigo Científico
 
-O artigo científico resultante desta pesquisa está disponível no repositório. Nele contém todas as informações sobre a pesquisa e sobre os resultados obtidos. [Clique aqui](#) para visualizar o documento completo.
+O artigo científico resultante desta pesquisa está disponível no repositório. Nele contém todas as informações sobre a pesquisa e sobre os resultados obtidos. [Clique aqui](https://github.com/JoaquimCruz/Graph-Based-Analysis-of-Hospital-Admissions-in-Western-Minas-Gerais/blob/main/Análise_de_internações_Hospitalares_baseadas_em_Grafos.pdf) para visualizar o documento completo.
 
 ## Tecnologias Utilizadas
 
