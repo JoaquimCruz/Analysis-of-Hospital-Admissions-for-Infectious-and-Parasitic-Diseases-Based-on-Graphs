@@ -12,10 +12,10 @@ from matplotlib.cm import ScalarMappable
 import matplotlib
 matplotlib.use('Agg')  # Backend para salvar gráficos
 
-output_dir = "Grafos"
+output_dir = "src/Grafos"
 os.makedirs(output_dir, exist_ok=True)
 
-df = pd.read_excel("/home/joaquim/Documents/Graph-Based-Analysis-of-Hospital-Admissions-in-Western-Minas-Gerais/Planilhas/Sexo.xlsx", header=None)
+df = pd.read_excel("Planilhas/Sexo.xlsx", header=None)
 df.columns = ["Cidade", "Populacao", "Sexo Feminino", "Sexo Masculino"]
 
 # Configurar a primeira coluna como índice das cidades
@@ -132,7 +132,7 @@ cbar.set_label('Índice da Comunidade')
 output_file = os.path.join(output_dir, "grafoComunidadesSexo_grande.png")
 plt.savefig(output_file, dpi=300, bbox_inches='tight')
 plt.close()
-print(f"Grafo grande salvo como '{output_file}'")
+
 
 df['Comunidade_sexo'] = df.index.map(comunidade_por_no_sexo)
 

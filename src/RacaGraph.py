@@ -15,7 +15,7 @@ matplotlib.use('Agg')  # Backend para salvar gráficos
 
 
 
-df = pd.read_excel("/home/joaquim/Documents/Graph-Based-Analysis-of-Hospital-Admissions-in-Western-Minas-Gerais/Planilhas/Raca.xlsx", header=None)
+df = pd.read_excel("Planilhas/Raca.xlsx", header=None)
 df.columns = ["Cidade", "Populacao", "Raça Branca", "Raça Negra", "Raça Parda", "Raça Amarela"]
 
 df.set_index("Cidade", inplace=True)
@@ -109,7 +109,7 @@ ax.axis('off')
 cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
-output_dir = "Grafos"
+output_dir = "src/Grafos"
 os.makedirs(output_dir, exist_ok=True)
 output_file = os.path.join(output_dir, "grafoComunidadesRaca_grande.png")
 plt.savefig(output_file, dpi=300, bbox_inches='tight')
