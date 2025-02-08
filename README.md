@@ -9,7 +9,7 @@
 
 Este repositório contém um artigo que analisa o perfil das internações hospitalares na Macrorregião Oeste de Minas Gerais. O Brasil atravessa uma transição demográfica e epidemiológica complexa, caracterizada pelo aumento das doenças crônicas não transmissíveis, ao lado da persistência de doenças infecciosas e parasitárias. 
 
-Neste estudo, utilizamos dados do Sistema de Informação Hospitalar do SUS (SIH/SUS) e aplicamos a teoria dos grafos para detectar padrões de similaridade entre os municípios.
+Neste estudo, utilizamos dados do Sistema de Informação Hospitalar do SUS (SIH/SUS) e aplicamos a teoria dos grafos para detectar padrões de similaridade entre os municípios. A base de dados modelada está contida nas planilhas dentro da pasta "Planilhas"
 
 Agrupamos as cidades com base em características como gênero, raça/etnia e faixa etária, identificando perfis predominantes de internação e outliers relevantes. Os resultados revelam uma distribuição heterogênea das internações, evidenciando a importância de políticas públicas direcionadas para reduzir desigualdades regionais na saúde.
 
@@ -51,5 +51,10 @@ pip install pandas scikit-learn networkx matplotlib seaborn
 ```sh
 pip install pandas scikit-learn networkx matplotlib seaborn
 ```
+
+## Autores
+<p>
+  Joaquim Cézar Santana da Cruz - Graduando em Engenharia da Computação pelo <a href="https://www.cefetmg.br" target="_blank">CEFET-MG</a>. Contato: (<a href="mailto:joaquim.cruz@aluno.cefetmg.br">joaquim.cruz@aluno.cefetmg.br</a>)
+</p>
 
 
