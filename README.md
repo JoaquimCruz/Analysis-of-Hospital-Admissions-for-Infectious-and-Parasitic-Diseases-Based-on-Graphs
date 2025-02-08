@@ -39,17 +39,20 @@ from matplotlib.cm import ScalarMappable
 Para rodar o código usando Python, é necessário instalar as bibliotecas utilizadas, utilizando o comando pip install. 
 ### Linux
 ```sh
-pip install pandas scikit-learn networkx matplotlib seaborn
+pip install pandas scikit-learn networkx matplotlib seaborn odfpy openpyxl xlrd
+
 ```
 
 ### Windows
 ```sh
-pip install pandas scikit-learn networkx matplotlib seaborn
+pip install pandas scikit-learn networkx matplotlib seaborn odfpy openpyxl xlrd
+
 ```
 
 ### macOS
 ```sh
-pip install pandas scikit-learn networkx matplotlib seaborn
+pip install pandas scikit-learn networkx matplotlib seaborn odfpy openpyxl xlrd
+
 ```
 
 ## Autores
