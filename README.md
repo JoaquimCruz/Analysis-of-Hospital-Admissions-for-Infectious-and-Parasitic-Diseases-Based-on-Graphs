@@ -1,4 +1,4 @@
-# Graph-Based Analysis of Hospital Admissions in Western Minas Gerais
+# Analysis of Hospital Admissions for Infectious and Parasitic Diseases Based on Graphs
 <div style="display: inline-block;">
 <img align="center" height="20px" width="60px" src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/> 
 <img align="center" height="20px" width="80px" src="https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg"/> 
