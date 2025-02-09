@@ -12,10 +12,10 @@ from matplotlib.cm import ScalarMappable
 import matplotlib
 matplotlib.use('Agg')  # Backend para salvar gráficos
 
-output_dir = "src/Grafos"
+output_dir = "Grafos"
 os.makedirs(output_dir, exist_ok=True)
 
-df = pd.read_excel("Planilhas/Sexo.xlsx", header=None)
+df = pd.read_excel("../Planilhas/Sexo.xlsx", header=None)
 df.columns = ["Cidade", "Populacao", "Sexo Feminino", "Sexo Masculino"]
 
 # Configurar a primeira coluna como índice das cidades

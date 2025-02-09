@@ -14,7 +14,7 @@ import matplotlib
 matplotlib.use('Agg')  # Backend para salvar gráficos
 
 # Carregar o arquivo Excel com dados de faixa etária e população
-df = pd.read_excel("Planilhas/FaixaEtaria.xlsx", header=None)
+df = pd.read_excel("../Planilhas/FaixaEtaria.xlsx", header=None)
 
 # Definir nomes das colunas: Cidade, Populacao, e faixas etárias
 df.columns = ["Cidade", "Populacao", "<1 ano", "1-4 anos", "5-14 anos", "15-24 anos", 
@@ -118,7 +118,7 @@ ax.axis('off')
 cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.04)
 cbar.set_label('Índice da Comunidade')
 
-output_dir = "src/Grafos"
+output_dir = "Grafos"
 os.makedirs(output_dir, exist_ok=True)
 
 output_file = os.path.join(output_dir, "grafoComunidadesFaixaEtaria_grande.png")
